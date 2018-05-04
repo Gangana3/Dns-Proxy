@@ -28,7 +28,9 @@ class DnsQuery(object):
         """
         Returns a textual representation of the queried domain name
         """
-        return self.name[1:-3].decode().replace('\x03', '.').replace('\x02', '.')
+        return self.name[1:-3].decode().replace('\x03', '.').replace('\x02',
+                                                                     '.')
+
 
 class DnsResponse(object):
     """
