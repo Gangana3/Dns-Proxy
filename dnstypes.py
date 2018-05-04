@@ -9,11 +9,11 @@ class DnsQuery(object):
     """
     Represents a parsed DNS query
     """
-    def __init__(query, client_address)
-        self.client_address = client_address  
+    def __init__(self, query, client_address):
+        self.client_address = client_address
 
         # Parse the query
-        parsed_query = __parse_query(query)
+        parsed_query = _parse_query(query)
 
         # assign the header fields
         self.transaction_id = parsed_query[0]
@@ -24,11 +24,11 @@ class DnsQuery(object):
         self.additional_rrs = parsed_query[5]
         self.name = parsed_query[6]
 
-    def get_name():
+    def get_name(self):
         """
         Returns a textual representation of the queried domain name
         """
-        return name[1:-3].encode().replace('\x03', '.').replace('\x06', '.')
+        return self.name[1:-3].decode().replace('\x03', '.').replace('\x02', '.')
 
 class DnsResponse(object):
     """
@@ -37,7 +37,7 @@ class DnsResponse(object):
     pass
 
 
-def __parse_query(query):
+def _parse_query(query):
     """
     Parses a DNS query
     """
