@@ -2,7 +2,7 @@
 Contains convenient types to work with when attempting to work with
 dns protocol.
 """
-
+from socket import inet_aton
 
 class DnsQuery(object):
 	"""
@@ -82,6 +82,15 @@ class Answer(object):
 		:return: Textual representation of the IP address
 		"""
 		return '.'.join(str(ord(byte)) for byte in self.address)
+
+	def change_ip(self, ip_addr):
+		"""
+		Changes the answer IP
+		:param ip_addr: ip address
+		:type ip_addr: str
+		:return: None
+		"""
+		self.address = inet_aton(ip_addr)
 
 	def __bytes__(self):
 		return self.name + self.answer_type + self.answer_class + self.ttl + \
