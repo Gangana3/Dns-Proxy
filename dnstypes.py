@@ -9,9 +9,7 @@ class DnsQuery(object):
 	Represents a parsed DNS query
 	"""
 
-	def __init__(self, query, client_address):
-		self.client_address = client_address
-
+	def __init__(self, query):
 		# Parse the query
 		parsed_query = _parse_query(query)
 
@@ -35,15 +33,36 @@ class DnsQuery(object):
 
 	def __bytes__(self):
 		return self.transaction_id + self.flags + self.questions + \
-               self.answer_rrs + self.authority_rrs + self.additional_rrs + \
-               self.name + self.dns_type + self.dns_class
+			   self.answer_rrs + self.authority_rrs + self.additional_rrs + \
+			   self.name + self.dns_type + self.dns_class
 
 
 class DnsResponse(object):
 	"""
 	Represents a DNS response
 	"""
-	pass
+	def __init__(self, response):
+		parsed_response = _parse_response(response)
+
+		# assign header fields -> (transaction_id, flags, questions, answer_rrs,
+		#						   authority_rrs, additional_rrs, name,
+		#						   dns_type, dns_class, Answers)
+		self.transaction_id = parsed_response[0]
+		self.flags = parsed_response[1]
+		self.questions = parsed_response[2]
+		self.answer_rrs = parsed_response[3]
+		self.authority_rrs = parsed_response[4]
+		self.additional_rrs = parsed_response[5]
+		self.name = parsed_response[6]
+		self.dns_type = parsed_response[7]
+		self.dns_class = parsed_response[8]
+		self.answers = parsed_response[9]
+
+	def __bytes__(self):
+		return self.transaction_id + self.flags + self.questions + \
+			   self.answer_rrs + self.authority_rrs + self.additional_rrs + \
+			   self.name + self.dns_type + self.dns_class + \
+			   b''.join(bytes(answer) for answer in self.answers)
 
 
 class Answer(object):
@@ -68,9 +87,14 @@ class Answer(object):
 		return self.name + self.answer_type + self.answer_class + self.ttl + \
 			   self.data_length + self.address
 
+
 def _parse_query(query):
 	"""
 	Parses a DNS query
+
+	:param query: DNS query to parse
+	:return: (transaction_id, flags, questions, answer_rrs, authority_rrs,
+	 		  additional_rrs, name, dns_type, dns_class)
 	"""
 	transaction_id = query[0:2]
 	flags = query[2:4]
@@ -122,6 +146,10 @@ def _parse_answer(answer):
 def _parse_response(response):
 	"""
 	Parses a DNS response
+
+	:return:(transaction_id, flags, questions, answer_rrs,
+		     authority_rrs, additional_rrs, name,
+		     dns_type, dns_class, Answers)
 	"""
 	answers = []
 	new_answer_start = b'\xc0\x0c'

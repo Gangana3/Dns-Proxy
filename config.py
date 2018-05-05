@@ -9,3 +9,6 @@ DEFAULT_IP = '127.0.0.1'
 IP_MAP = {
     'www.facebook.com': DEFAULT_IP
 }
+
+# The DNS server that will be used in order to answer unmapped queries
+DNS_SERVER = '8.8.8.8'
