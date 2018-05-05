@@ -113,13 +113,17 @@ def _parse_query(query):
 	:return: (transaction_id, flags, questions, answer_rrs, authority_rrs,
 	 		  additional_rrs, name, dns_type, dns_class)
 	"""
+	# Validate query
+	name_ending = b'\x00' 	# Domain name ending
+	if len(query) <= 12: raise InvalidQueryError
+	if name_ending not in query[12:]: raise InvalidQueryError
+
 	transaction_id = query[0:2]
 	flags = query[2:4]
 	questions = query[4:6]
 	answer_rrs = query[6:8]
 	authority_rrs = query[8:10]
 	additional_rrs = query[10:12]
-	name_ending = b'\x00'
 	name = query[12:query.find(name_ending, 12) + len(name_ending)]
 	dns_type = query[-4:-2]
 	dns_class = query[-2:]
