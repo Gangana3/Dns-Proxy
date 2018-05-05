@@ -2,6 +2,8 @@
 Contains convenient types to work with when attempting to work with
 dns protocol.
 """
+import re
+from exceptions import *
 from socket import inet_aton
 
 class DnsQuery(object):
@@ -90,6 +92,12 @@ class Answer(object):
 		:type ip_addr: str
 		:return: None
 		"""
+		# Validate IP address
+		if not re.match(r'\d{1-3}\.\d{1-3}\.\d{1-3}\.\d{1-3}', ip_addr):
+			raise InvalidIPError
+		if any(int(byte) > 255 for byte in ip_addr.split('.')):
+			raise InvalidIPError
+
 		self.address = inet_aton(ip_addr)
 
 	def __bytes__(self):
