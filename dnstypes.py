@@ -155,7 +155,7 @@ def _parse_response(response):
 	new_answer_start = b'\xc0\x0c'
 	while new_answer_start in response:
 		index = response.rfind(new_answer_start)
-		answers.append(Answer(response))
+		answers.append(Answer(response[index:]))
 		response = response[:index]
-
-	return _parse_query(response) + (reversed(answers),)
+	answers.reverse()
+	return _parse_query(response) + (answers,)
