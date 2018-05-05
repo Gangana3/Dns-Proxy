@@ -6,6 +6,7 @@ import re
 from exceptions import *
 from socket import inet_aton
 
+
 class DnsQuery(object):
 	"""
 	Represents a parsed DNS query

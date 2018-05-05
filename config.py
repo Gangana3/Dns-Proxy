@@ -6,7 +6,7 @@ This file contains all the dns proxy server configuration
 DEFAULT_IP = '127.0.0.1'
 
 # Maps between specific queried domain name and ip
-IP_MAP = {
+DOMAIN_MAP = {
     'www.facebook.com': DEFAULT_IP
 }
 
