@@ -11,4 +11,4 @@ DOMAIN_MAP = {
 }
 
 # The DNS server that will be used in order to answer unmapped queries
-DNS_SERVER = '8.8.8.8'
+DEFAULT_DNS_SERVER = '8.8.8.8'

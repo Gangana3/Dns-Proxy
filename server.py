@@ -6,6 +6,9 @@ from config import *
 from dnstypes import *
 
 
+DNS_PORT = 53
+DEFAULT_BUFFER_SIZE = 1024
+
 class DnsServer(object):
 	"""
 	Represents the dns server
@@ -20,22 +23,41 @@ class DnsServer(object):
 		self.verbose = verbose
 
 	def run(self):
+		# Used for getting responses from a real DNS server
+		client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		server_socket.bind((self.ip, self.port))
 
 		try:
 			while True:
 				# Get data from client
-				(data, client_address) = server_socket.recvfrom(1024)
+				(data, client_address) = server_socket.recvfrom(
+					DEFAULT_BUFFER_SIZE)
 				query = DnsQuery(data)
 
+				# Get response
+				client_socket.sendto(bytes(query), (DEFAULT_DNS_SERVER,
+													DNS_PORT))
+				(response, client_address) = client_socket.recvfrom(
+					DEFAULT_BUFFER_SIZE)
+				response = DnsResponse(response)
+
 				# Analyze data
-				if query.get_name() in DOMAIN_MAP.keys():
-					# in case the domain is mapped
+				domain_name = query.get_name()
+				if domain_name in DOMAIN_MAP.keys():
+					# In case the domain is mapped
+					if len(response.answers) > 2:
+						# In case there is more than one answer, leave only one
+						response.answer_rrs = b'\x00\x01'
+						del response.answers[1:]
+						response.answers[0].change_ip(DOMAIN_MAP[domain_name])
+
+				# Send response to the client
+				server_socket.sendto(bytes(response), client_address)
 
 		except KeyboardInterrupt:
 			print('\rServer Shutdown!')
 		finally:
 			if server_socket is not None: server_socket.close()
-
-
+			if server_socket is not None: server_socket.close()
