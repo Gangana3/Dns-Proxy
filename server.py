@@ -45,8 +45,7 @@ class DnsServer(object):
 				# Get response
 				client_socket.sendto(bytes(query), (DEFAULT_DNS_SERVER,
 													DNS_PORT))
-				(response, client_address) = client_socket.recvfrom(
-					DEFAULT_BUFFER_SIZE)
+				response = client_socket.recvfrom(DEFAULT_BUFFER_SIZE)[0]
 				response = DnsResponse(response)
 
 				# Analyze data
@@ -57,15 +56,18 @@ class DnsServer(object):
 						# In case there is more than one answer, leave only one
 						response.answer_rrs = b'\x00\x01'
 						del response.answers[1:]
-						response.answers[0].change_ip(DOMAIN_MAP[domain_name])
+					response.answers[0].change_ip(DOMAIN_MAP[domain_name])
+
 
 				# Send response to the client
 				server_socket.sendto(bytes(response), client_address)
 
 				if self.verbose:
-					print('-> {} Asked for {} and received: {}'.format(
+					print('-' * 80)
+					print('{} Asked for {} and received: \n{}'.format(
 						client_address, query.get_name(), response.answers
 					))
+					print('-' * 80)
 
 
 		except KeyboardInterrupt:

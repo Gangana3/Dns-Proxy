@@ -32,7 +32,8 @@ class DnsQuery(object):
 		Returns a textual representation of the queried domain name
 		"""
 		return self.name[1:-1].decode().replace(
-			'\x03', '.').replace('\x02', '.').replace('\x06', '')
+			'\x03', '.').replace('\x02', '.').replace('\x06', '.').\
+			replace('\x08', '.')
 
 	def __bytes__(self):
 		return self.transaction_id + self.flags + self.questions + \
@@ -84,7 +85,7 @@ class Answer(object):
 		"""
 		:return: Textual representation of the IP address
 		"""
-		return '.'.join(str(ord(byte)) for byte in self.address)
+		return '.'.join(str(byte) for byte in self.address)
 
 	def change_ip(self, ip_addr):
 		"""
@@ -94,7 +95,7 @@ class Answer(object):
 		:return: None
 		"""
 		# Validate IP address
-		if not re.match(r'\d{1-3}\.\d{1-3}\.\d{1-3}\.\d{1-3}', ip_addr):
+		if not re.match(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_addr):
 			raise InvalidIPError
 		if any(int(byte) > 255 for byte in ip_addr.split('.')):
 			raise InvalidIPError
