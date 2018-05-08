@@ -105,6 +105,9 @@ class Answer(object):
 		return self.name + self.answer_type + self.answer_class + self.ttl + \
 			   self.data_length + self.address
 
+	def __repr__(self):
+		return self.get_address()
+
 
 def _parse_query(query):
 	"""

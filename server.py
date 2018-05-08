@@ -25,9 +25,15 @@ class DnsServer(object):
 	def run(self):
 		# Used for getting responses from a real DNS server
 		client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		server_socket.bind((self.ip, self.port))
+
+		if self.verbose:
+			print('-' * 80)
+			print('Starting DNS proxy server!\n'.center(80, ' '))
+			print('--> Port: {}'.format(self.port))
+			print('--> IP: {}'.format(self.ip))
+			print('-' * 80)
 
 		try:
 			while True:
@@ -56,8 +62,15 @@ class DnsServer(object):
 				# Send response to the client
 				server_socket.sendto(bytes(response), client_address)
 
+				if self.verbose:
+					print('-> {} Asked for {} and received: {}'.format(
+						client_address, query.get_name(), response.answers
+					))
+
+
 		except KeyboardInterrupt:
-			print('\rServer Shutdown!')
+			if self.verbose:
+				print('\rServer Shutdown!')
 		finally:
 			if server_socket is not None: server_socket.close()
 			if server_socket is not None: server_socket.close()
